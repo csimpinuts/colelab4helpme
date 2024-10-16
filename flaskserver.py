@@ -57,7 +57,11 @@ def callback():
     
     response = requests.post(token_url, data=token_data)
     if response.status_code != 200:
-        return f"Error: {response.json().get('error_description', 'Unknown error')}"
+        return f"""<a href="/top?access_token={access_token}&time_range=1mo">View Top Songs and Artists (Last Month)</a>
+            <br>
+            <a href="/top?access_token={access_token}&time_range=6mo">View Top Songs and Artists (Last 6 Months)</a>
+            <br>
+            <a href="/top?access_token={access_token}&time_range=12mo">View Top Songs and Artists (All Time)</a>"""
     
     access_token = response.json().get('access_token')
 
@@ -100,7 +104,11 @@ def callback():
         else:
             return "<h1>No song is currently playing.</h1>"
     else:
-        return f"Error retrieving playback state: {playback_response.status_code}, content: {playback_response.text}"
+        return f"""<a href="/top?access_token={access_token}&time_range=1mo">View Top Songs and Artists (Last Month)</a>
+            <br>
+            <a href="/top?access_token={access_token}&time_range=6mo">View Top Songs and Artists (Last 6 Months)</a>
+            <br>
+            <a href="/top?access_token={access_token}&time_range=12mo">View Top Songs and Artists (All Time)</a>"""
 
 @app.route('/top')
 def top_tracks_artists():
@@ -162,31 +170,17 @@ def top_tracks_artists():
                 .then(response => response.text())
                 .then(data => {
                     console.log(data);  // You can log or handle the response as needed
-                    updateNowPlaying(this.parentElement);
                 })
                 .catch(error => console.error('Error:', error));
             });
         });
-
-        function updateNowPlaying(trackElement) {
-            // Remove 'now-playing' class from any other track
-            document.querySelectorAll('.now-playing').forEach(item => item.classList.remove('now-playing'));
-
-            // Add 'now-playing' class to the clicked track
-            trackElement.classList.add('now-playing');
-
-            // Optionally, update a separate section of the page with the current playing track info
-            const nowPlayingElement = document.getElementById('now-playing');
-            if (nowPlayingElement) {
-                nowPlayingElement.innerHTML = `Now playing: ${trackElement.innerText}`;
-            }
-        }
         </script>
         '''
 
-        return track_html + artist_html + '<div id="now-playing">Now playing: None</div>'
+        return track_html + artist_html
     else:
         return f"Error retrieving top tracks or artists: {top_tracks_response.json().get('error_description')}"
+
 
 @app.route('/play/<track_id>')
 def play_track(track_id):
